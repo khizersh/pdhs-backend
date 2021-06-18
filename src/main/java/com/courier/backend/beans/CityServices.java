@@ -11,25 +11,77 @@ public class CityServices {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Integer cityId;
-    private String city;
+    private Integer zoneId;
+    private String zone;
     private Integer serviceId;
     private String service;
     private Integer weightId;
-    private Double weight;
+    private String weight;
+    private Double startWeight;
+    private Double endWeight;
+    private Boolean defaultValue;
     private Double rate;
+
 
 
 
 //    getter setter
 
 
-    public String getCity() {
-        return city;
+    public Boolean getDefaultValue() {
+        return defaultValue;
     }
 
-    public void setCity(String city) {
-        this.city = city;
+    public void setDefaultValue(Boolean defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+
+    public Double getStartWeight() {
+        return startWeight;
+    }
+
+    public void setStartWeight(Double startWeight) {
+        this.startWeight = startWeight;
+    }
+
+    public Double getEndWeight() {
+        return endWeight;
+    }
+
+    public void setEndWeight(Double endWeight) {
+        this.endWeight = endWeight;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Integer getZoneId() {
+        return zoneId;
+    }
+
+    public void setZoneId(Integer zoneId) {
+        this.zoneId = zoneId;
+    }
+
+    public String getZone() {
+        return zone;
+    }
+
+    public void setZone(String zone) {
+        this.zone = zone;
+    }
+
+    public Integer getServiceId() {
+        return serviceId;
+    }
+
+    public void setServiceId(Integer serviceId) {
+        this.serviceId = serviceId;
     }
 
     public String getService() {
@@ -48,36 +100,12 @@ public class CityServices {
         this.weightId = weightId;
     }
 
-    public Double getWeight() {
+    public String getWeight() {
         return weight;
     }
 
-    public void setWeight(Double weight) {
+    public void setWeight(String weight) {
         this.weight = weight;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getCityId() {
-        return cityId;
-    }
-
-    public void setCityId(Integer cityId) {
-        this.cityId = cityId;
-    }
-
-    public Integer getServiceId() {
-        return serviceId;
-    }
-
-    public void setServiceId(Integer serviceId) {
-        this.serviceId = serviceId;
     }
 
     public Double getRate() {
@@ -86,19 +114,5 @@ public class CityServices {
 
     public void setRate(Double rate) {
         this.rate = rate;
-    }
-
-    @Override
-    public String toString() {
-        return "CityServices{" +
-                "id=" + id +
-                ", cityId=" + cityId +
-                ", city='" + city + '\'' +
-                ", serviceId=" + serviceId +
-                ", service='" + service + '\'' +
-                ", weightId=" + weightId +
-                ", weight=" + weight +
-                ", rate=" + rate +
-                '}';
     }
 }

@@ -11,7 +11,27 @@ public class Weight {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Double weight;
+    private Double startWeight;
+    private Double endWeight;
+    private Boolean defaultCheck;
+    private Double defaultWeight;
+
+
+    public Boolean getDefaultCheck() {
+        return defaultCheck;
+    }
+
+    public void setDefaultCheck(Boolean defaultCheck) {
+        this.defaultCheck = defaultCheck;
+    }
+
+    public Double getDefaultWeight() {
+        return defaultWeight;
+    }
+
+    public void setDefaultWeight(Double defaultWeight) {
+        this.defaultWeight = defaultWeight;
+    }
 
     public Integer getId() {
         return id;
@@ -21,11 +41,19 @@ public class Weight {
         this.id = id;
     }
 
-    public Double getWeight() {
-        return weight;
+    public Double getStartWeight() {
+        return startWeight;
     }
 
-    public void setWeight(Double weight) {
-        this.weight = weight;
+    public void setStartWeight(Double startWeight) {
+        this.startWeight = startWeight;
+    }
+
+    public Double getEndWeight() {
+        return endWeight;
+    }
+
+    public void setEndWeight(Double endWeight) {
+        this.endWeight = endWeight;
     }
 }

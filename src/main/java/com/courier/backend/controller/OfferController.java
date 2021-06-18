@@ -1,5 +1,6 @@
 package com.courier.backend.controller;
 
+import com.courier.backend.beans.AmazonClient;
 import com.courier.backend.beans.Banner;
 import com.courier.backend.beans.Offers;
 import com.courier.backend.repo.OfferRepo;
@@ -29,6 +30,9 @@ public class OfferController {
     @Autowired
     private FileStorageService fileService;
 
+    @Autowired
+    private AmazonClient amazonClient;
+
     @GetMapping
     public ResponseEntity getAll(){
         return service.getSuccessResponse(offerRepo.findAll());
@@ -48,7 +52,7 @@ public class OfferController {
         if(file == null){
             return service.getErrorResponse("Select image!");
         }
-        String img = fileService.storeAndReturnFile(file);
+        String img = amazonClient.uploadFile(file);
         offers.setImage(img);
         return service.getSuccessResponse(offerRepo.save(offers));
     }
@@ -69,7 +73,7 @@ public class OfferController {
         }
 
         if(file != null){
-            String img = fileService.storeAndReturnFile(file);
+            String img = amazonClient.uploadFile(file);
             offers.setImage(img);
         }
 
@@ -85,6 +89,13 @@ public class OfferController {
         }
         if(!offerRepo.existsById(id)){
             return service.getErrorResponse("Invalid request!");
+        }
+        Offers off = offerRepo.getOne(id);
+        try{
+        amazonClient.deleteFileFromS3Bucket(off.getImage());
+
+        }catch (Exception e){
+
         }
 
         offerRepo.deleteById(id);

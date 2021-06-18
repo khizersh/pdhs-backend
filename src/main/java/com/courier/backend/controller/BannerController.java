@@ -1,5 +1,6 @@
 package com.courier.backend.controller;
 
+import com.courier.backend.beans.AmazonClient;
 import com.courier.backend.beans.Banner;
 import com.courier.backend.repo.BannerRepo;
 import com.courier.backend.utils.FileStorageService;
@@ -26,6 +27,8 @@ public class BannerController {
     private GlobalService service;
     @Autowired
     private FileStorageService fileService;
+    @Autowired
+    private AmazonClient amazonClient;
 
     @GetMapping
     public ResponseEntity getAll(){
@@ -69,7 +72,7 @@ public class BannerController {
         if(file == null){
             return service.getErrorResponse("Select image!");
         }
-        String img = fileService.storeAndReturnFile(file);
+        String img = amazonClient.uploadFile(file);
         ban.setImage(img);
         return service.getSuccessResponse(bannerRepo.save(ban));
     }
@@ -92,7 +95,7 @@ public class BannerController {
             db.setUrl(ban.getUrl());
         }
         if(file != null){
-            String img = fileService.storeAndReturnFile(file);
+            String img = amazonClient.uploadFile(file);
             ban.setImage(img);
         }
 
@@ -109,6 +112,13 @@ public class BannerController {
         if(!bannerRepo.existsById(id)){
             return service.getErrorResponse("Invalid request!");
         }
+
+        Banner ban = bannerRepo.getOne(id);
+        try {
+
+            amazonClient.deleteFileFromS3Bucket(ban.getImage());
+
+        }catch (Exception e){}
 
         bannerRepo.deleteById(id);
 

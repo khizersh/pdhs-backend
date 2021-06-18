@@ -11,7 +11,7 @@ public interface CityServiceRepo extends JpaRepository<CityServices , Integer> {
 
     List<CityServices> findByOrderByIdAsc();
 
-    @Query(value = "select * from city_services where service_id=?1 AND city_id = ?2",nativeQuery = true)
-    List<CityServices> findByServiceIdAndCityId(Integer sid, Integer cid);
+    @Query(value = "select * from city_services where service_id=?1 AND zone_id = ?2",nativeQuery = true)
+    List<CityServices> findByServiceAndZoneId(Integer sid, Integer cid);
 
 }

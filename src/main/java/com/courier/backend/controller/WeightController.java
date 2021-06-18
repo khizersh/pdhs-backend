@@ -25,8 +25,18 @@ public class WeightController {
 
     @PostMapping
     public ResponseEntity add(@RequestBody Weight weight){
-        if(weight.getWeight() < 0){
+        if(weight.getStartWeight() < 0){
             return globalService.getErrorResponse("Invalid weight!");
+        }
+        if(weight.getEndWeight() < 0){
+            return globalService.getErrorResponse("Invalid weight!");
+        }
+        if(weight.getDefaultCheck()){
+            if(weight.getDefaultWeight() < 0){
+                return globalService.getErrorResponse("Invalid weight!");
+            }
+            weight.setStartWeight(null);
+            weight.setEndWeight(null);
         }
         return globalService.getSuccessResponse(weightRepo.save(weight));
     }
@@ -46,8 +56,11 @@ public class WeightController {
         if(db == null){
             return globalService.getErrorResponse("Invalid request!");
         }
-        if(weight.getWeight() != null){
-            db.setWeight(weight.getWeight());
+        if(weight.getStartWeight() != null){
+            db.setStartWeight(weight.getStartWeight());
+        }
+        if(weight.getEndWeight() != null){
+            db.setEndWeight(weight.getEndWeight());
         }
 
         return globalService.getSuccessResponse(weightRepo.save(db));

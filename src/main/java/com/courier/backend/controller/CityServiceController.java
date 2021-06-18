@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/city-service")
 public class CityServiceController {
@@ -46,12 +48,8 @@ public class CityServiceController {
             return globalService.getErrorResponse("Invalid Weight!");
         }
 
-        Cities cities = cityRepo.getOne(city.getCityId());
-        Service service = serviceRepo.getOne(city.getServiceId());
-
-
         double weight = 0.0;
-        if(city.getVolume()){
+        if(city.getVolume() != null &&  city.getVolume() == true){
             if(city.getHeight() > 0 && city.getWidth() > 0 && city.getLength() > 0 ){
                 weight = (city.getHeight() * city.getWidth() * city.getLength()) / 5000;
             }
@@ -59,30 +57,23 @@ public class CityServiceController {
             weight = city.getWeight();
         }
 
+        Cities cities = cityRepo.getOne(city.getCityId());
+        Service service = serviceRepo.getOne(city.getServiceId());
+
         CityServices price = new CityServices();
-        CityServices onePrice = new CityServices();
-        for (CityServices i:cityServiceRepo.findByServiceIdAndCityId(service.getId() , cities.getId())) {
-            if( i.getWeight().equals(weight)){
-                price = i;
 
-            }
-        }
-
-        System.out.println("price: "+ price );
-
-        if(price.getId()  == null){
-            for (CityServices i:cityServiceRepo.findByServiceIdAndCityId(service.getId() , cities.getId())) {
-                if( i.getWeight().equals(1.0)){
-                    onePrice = i;
-
+        List<CityServices> list = cityServiceRepo.findByServiceAndZoneId(service.getId() , cities.getZoneId());
+        for (CityServices i: list) {
+            if(i.getStartWeight() != null && i.getEndWeight() != null ){
+                if(Double.compare(i.getStartWeight() , weight) <= 0 && Double.compare(i.getEndWeight() , weight) >= 0) {
+                    price = i;
+                    break;
                 }
             }
-            if(onePrice.getId() != null){
-
-            price.setRate(onePrice.getRate() * weight);
-            }
+             if(i.getDefaultValue() != null && i.getDefaultValue() == true ){
+               price = i;
+           }
         }
-        System.out.println("onePrice: "+ onePrice );
 
             return globalService.getSuccessResponse(price);
     }
@@ -91,8 +82,8 @@ public class CityServiceController {
 
     @PostMapping
     public ResponseEntity add(@RequestBody CityServices city){
-        if(city.getCityId() == null){
-            return globalService.getErrorResponse("Select City!");
+        if(city.getZoneId() == null){
+            return globalService.getErrorResponse("Select zone!");
         }
         if(city.getServiceId() == null){
             return globalService.getErrorResponse("Select Service!");
@@ -101,13 +92,25 @@ public class CityServiceController {
             return globalService.getErrorResponse("Select Weight!");
         }
 
-        Cities cities = cityRepo.getOne(city.getCityId());
+        Zone zone = zoneRepo.getOne(city.getZoneId());
         Service service = serviceRepo.getOne(city.getServiceId());
         Weight weight = weightRepo.getOne(city.getWeightId());
 
-        city.setCity(cities.getCity());
+        city.setZone(zone.getZone());
         city.setService(service.getService());
-        city.setWeight(weight.getWeight());
+
+        if(weight.getDefaultCheck() != null && weight.getDefaultCheck() == true){
+            city.setDefaultValue(true);
+            city.setWeight(weight.getDefaultWeight() + " (Default)");
+        }else{
+            city.setDefaultValue(false);
+            city.setWeight(weight.getStartWeight() + " - " +  weight.getEndWeight());
+            city.setStartWeight(weight.getStartWeight());
+            city.setEndWeight(weight.getEndWeight());
+        }
+
+
+
 
         return globalService.getSuccessResponse(cityServiceRepo.save(city));
     }
@@ -128,10 +131,10 @@ public class CityServiceController {
         }
         CityServices db = cityServiceRepo.getOne(city.getId());
 
-        if(city.getCityId() != null){
-            Cities cities = cityRepo.getOne(city.getCityId());
-            db.setCityId(cities.getId());
-            db.setCity(cities.getCity());
+        if(city.getZone() != null){
+            Zone zone = zoneRepo.getOne(city.getZoneId());
+            db.setZoneId(zone.getId());
+            db.setZone(zone.getZone());
         }
         if(city.getServiceId() == null){
             Service service = serviceRepo.getOne(city.getServiceId());
@@ -141,14 +144,12 @@ public class CityServiceController {
         if(city.getWeightId() == null){
             Weight weight = weightRepo.getOne(city.getWeightId());
             db.setWeightId(weight.getId());
-            db.setWeight(weight.getWeight());
+            city.setWeight(weight.getStartWeight() + " - " +  weight.getEndWeight());
         }
         if(city.getRate() > 0){
 
             db.setRate(city.getRate());
         }
-
-
 
         return globalService.getSuccessResponse(cityServiceRepo.save(db));
     }
